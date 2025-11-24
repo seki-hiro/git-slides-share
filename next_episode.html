@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Git講習スライド：予告編</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Git講習スライド：予告編（スマホ対応）</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -20,9 +20,10 @@
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            overflow: hidden; /* Prevent body scroll */
         }
 
-        /* --- Slide Container --- */
+        /* --- Slide Container (Desktop Default) --- */
         .slide-container {
             width: 960px;
             height: 540px;
@@ -37,29 +38,86 @@
         }
         .slide-container.active { display: flex; }
 
+        /* --- Mobile Responsive Styles --- */
+        @media (max-width: 768px) {
+            .slide-container {
+                width: 100vw;
+                height: 100dvh; /* Dynamic viewport height for mobile */
+                border-radius: 0;
+                padding: 20px 16px 80px 16px; /* Add bottom padding for controls */
+                box-shadow: none;
+            }
+            .header-title { font-size: 1.8rem !important; }
+            .header-subtitle { font-size: 0.9rem !important; }
+            .forest-file { transform: scale(0.85); }
+            
+            /* Slide 2 Layout Change */
+            #slide2 .content-area .flex {
+                flex-direction: column;
+                gap: 1rem;
+                justify-content: center;
+            }
+            #slide2 .mystery-card {
+                width: 100% !important;
+                padding: 1rem !important;
+            }
+            #slide2 .fa-arrow-right {
+                transform: rotate(90deg); /* Point down on mobile */
+                margin: 0.5rem 0;
+            }
+            
+            /* Slide 3 Text Sizes */
+            .teaser-title { font-size: 2.5rem !important; }
+            .teaser-subtitle { font-size: 1.2rem !important; margin-bottom: 2rem !important; }
+            .teaser-main-theme { font-size: 1.5rem !important; padding: 0.8rem 1.5rem !important; width: 90%; }
+            
+            /* Controls moved to bottom fixed */
+            .controls {
+                position: fixed;
+                bottom: 20px;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                background: rgba(255,255,255,0.1);
+                backdrop-filter: blur(4px);
+                padding: 10px 0;
+                margin: 0 !important;
+                justify-content: center;
+                gap: 15px;
+            }
+            .btn {
+                padding: 12px 24px; /* Larger touch target */
+                font-size: 1rem;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            }
+        }
+
         /* --- Unified Header System --- */
         .slide-header {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             position: relative;
             z-index: 20;
             border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 16px;
+            padding-bottom: 12px;
+            flex-shrink: 0; /* Don't shrink header */
         }
         .header-top-row {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
         }
         .header-badge {
             background-color: #2563eb;
             color: white;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 9999px;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 0.05em;
             box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+            white-space: nowrap;
         }
         .header-badge.alert { background-color: #ef4444; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
         
@@ -67,7 +125,7 @@
             font-size: 2.25rem;
             font-weight: 900;
             color: #1e293b;
-            line-height: 1;
+            line-height: 1.1;
         }
         .header-subtitle {
             font-size: 1.125rem;
@@ -81,6 +139,7 @@
             flex-grow: 1;
             position: relative;
             z-index: 10;
+            height: 100%; /* Ensure full height usage */
         }
 
         /* --- Slide 1: Forest Specifics --- */
@@ -110,6 +169,7 @@
             left: 0;
             width: 100%;
             z-index: 50;
+            padding: 20px;
         }
         .teaser-title {
             font-size: 4rem;
@@ -120,6 +180,7 @@
             color: transparent;
             margin-bottom: 1rem;
             letter-spacing: -0.05em;
+            line-height: 1.2;
         }
         .teaser-subtitle {
             font-size: 1.5rem;
@@ -138,10 +199,12 @@
             transform: scale(0.9);
             opacity: 0;
             animation: scaleIn 0.5s ease-out 0.5s forwards;
+            max-width: 100%;
+            word-break: keep-all;
         }
         .teaser-footer {
             position: absolute;
-            bottom: 30px;
+            bottom: 80px; /* Adjusted for mobile controls */
             color: #475569;
             font-size: 0.9rem;
             letter-spacing: 0.1em;
@@ -152,7 +215,6 @@
         .pop { animation: popIn 0.5s ease-out forwards; opacity: 0; }
         @keyframes scaleIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         
-        /* Floating Animation for Question Marks (Restored) */
         @keyframes float { 
             0%, 100% { transform: translateY(0) rotate(0deg); } 
             50% { transform: translateY(-10px) rotate(10deg); } 
@@ -184,10 +246,11 @@
                 <i class="fa-solid fa-tree absolute text-8xl text-green-100/50" style="bottom: 40px; right: 100px;"></i>
             </div>
             <div class="flex-grow relative h-full border-2 border-dashed border-gray-300 rounded-xl bg-white/40 backdrop-blur-[1px] z-10">
-                <div class="absolute top-4 left-4 z-30"><div class="flex items-center gap-2 text-gray-500 font-bold bg-white/90 px-3 py-1 rounded shadow-sm border border-gray-200"><i class="fa-regular fa-folder-open text-yellow-500"></i> Documents/MATLAB/research/src</div></div>
+                <div class="absolute top-4 left-4 z-30"><div class="flex items-center gap-2 text-gray-500 font-bold bg-white/90 px-3 py-1 rounded shadow-sm border border-gray-200"><i class="fa-regular fa-folder-open text-yellow-500"></i> <span class="text-xs sm:text-base">.../MATLAB/research/src</span></div></div>
                 
                 <!-- Scattered Files -->
-                <div class="forest-wrapper pop" style="top: 40%; left: 10%; animation-delay: 0.1s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-blue-600"></i> sim_main.m</div></div>
+                <!-- Using percentages allows relative positioning on both mobile and desktop -->
+                <div class="forest-wrapper pop" style="top: 40%; left: 10%; animation-delay: 0.1s;"><i class="fa-solid fa-tree tree-back text-green-600 opacity-50"></i><div class="forest-file"><i class="fa-solid fa-file-code text-blue-600"></i> sim_main.m</div></div>
                 <div class="forest-wrapper pop" style="top: 20%; left: 30%; animation-delay: 0.3s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_main_copy.m</div></div>
                 <div class="forest-wrapper pop" style="top: 60%; left: 30%; animation-delay: 0.4s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_main_v2.m</div></div>
                 <div class="forest-wrapper pop" style="top: 10%; left: 55%; animation-delay: 0.6s; transform: rotate(-5deg);"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_main_copy_2.m</div></div>
@@ -249,7 +312,7 @@
         <div class="teaser-container">
             <div class="teaser-subtitle">この「絶望」から脱出する方法とは...？</div>
             <h1 class="teaser-title">To Be Continued</h1>
-            <div class="mt-8">
+            <div class="mt-8 w-full flex flex-col items-center">
                 <p class="text-slate-400 mb-2 text-sm font-bold tracking-widest uppercase">Main Session Theme</p>
                 <div class="teaser-main-theme">
                     Git コード管理術
