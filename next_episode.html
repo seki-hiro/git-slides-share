@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git講習スライド：予告編</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+        
+        /* --- Global & Reset --- */
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #1a202c;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* --- Slide Container --- */
+        .slide-container {
+            width: 960px;
+            height: 540px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: none;
+            flex-direction: column;
+            border-radius: 8px;
+            padding: 48px;
+        }
+        .slide-container.active { display: flex; }
+
+        /* --- Unified Header System --- */
+        .slide-header {
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 20;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+        }
+        .header-top-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+        .header-badge {
+            background-color: #2563eb;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+        .header-badge.alert { background-color: #ef4444; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
+        
+        .header-title {
+            font-size: 2.25rem;
+            font-weight: 900;
+            color: #1e293b;
+            line-height: 1;
+        }
+        .header-subtitle {
+            font-size: 1.125rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-left: 4px;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex-grow: 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- Slide 1: Forest Specifics --- */
+        .forest-bg-layer { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .forest-wrapper { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; transform-origin: bottom center; }
+        .tree-back { position: absolute; bottom: -10px; color: #bbf7d0; font-size: 5rem; z-index: 0; }
+        .forest-file { position: relative; z-index: 1; background: #fff; border: 2px solid #cbd5e0; padding: 6px 10px; border-radius: 4px; font-family: monospace; font-size: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .which-one-badge { position: absolute; bottom: 0; right: 0; font-size: 2.5rem; font-weight: 900; color: #ef4444; transform: rotate(-10deg); border: 4px solid #ef4444; padding: 4px 12px; border-radius: 8px; background: white; box-shadow: 0 10px 15px rgba(0,0,0,0.1); z-index: 30; }
+
+        /* --- Slide 2: Mystery Specifics --- */
+        .graph-paper { background-image: radial-gradient(#cbd5e0 1px, transparent 1px); background-size: 20px 20px; }
+        .mystery-card { background: white; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-radius: 0.75rem; }
+        .question-mark { position: absolute; font-weight: 900; color: #ef4444; animation: float 2s infinite ease-in-out; }
+
+        /* --- Slide 3: Teaser Specifics --- */
+        .teaser-container {
+            background: #0f172a; /* slate-900 */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+        }
+        .teaser-title {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #60a5fa, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.05em;
+        }
+        .teaser-subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 3rem;
+            font-weight: bold;
+        }
+        .teaser-main-theme {
+            background: white;
+            color: #0f172a;
+            padding: 1rem 3rem;
+            border-radius: 9999px;
+            font-size: 2rem;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            transform: scale(0.9);
+            opacity: 0;
+            animation: scaleIn 0.5s ease-out 0.5s forwards;
+        }
+        .teaser-footer {
+            position: absolute;
+            bottom: 30px;
+            color: #475569;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* --- Animation --- */
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        .pop { animation: popIn 0.5s ease-out forwards; opacity: 0; }
+        @keyframes scaleIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        /* Floating Animation for Question Marks (Restored) */
+        @keyframes float { 
+            0%, 100% { transform: translateY(0) rotate(0deg); } 
+            50% { transform: translateY(-10px) rotate(10deg); } 
+        }
+
+        /* Controls */
+        .controls { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding-bottom: 20px; }
+        .btn { padding: 10px 20px; background-color: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        .btn:hover { background-color: #1d4ed8; }
+        .btn.active { background-color: #1e3a8a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Forest -->
+    <div class="slide-container active" id="slide1">
+        <!-- Unified Header -->
+        <div class="slide-header">
+            <div class="header-top-row">
+                <span class="header-badge alert">あるある①</span>
+                <h1 class="header-title">コピペの森</h1>
+            </div>
+            <p class="header-subtitle">「あれ…どのファイルが本物の最新版だっけ？」</p>
+        </div>
+
+        <div class="content-area">
+            <div class="forest-bg-layer">
+                <i class="fa-solid fa-tree absolute text-9xl text-green-100/50" style="bottom: -20px; left: -20px;"></i>
+                <i class="fa-solid fa-tree absolute text-8xl text-green-100/50" style="bottom: 40px; right: 100px;"></i>
+            </div>
+            <div class="flex-grow relative h-full border-2 border-dashed border-gray-300 rounded-xl bg-white/40 backdrop-blur-[1px] z-10">
+                <div class="absolute top-4 left-4 z-30"><div class="flex items-center gap-2 text-gray-500 font-bold bg-white/90 px-3 py-1 rounded shadow-sm border border-gray-200"><i class="fa-regular fa-folder-open text-yellow-500"></i> Documents/MATLAB/research/src</div></div>
+                
+                <!-- Scattered Files -->
+                <div class="forest-wrapper pop" style="top: 40%; left: 10%; animation-delay: 0.1s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-blue-600"></i> sim_main.m</div></div>
+                <div class="forest-wrapper pop" style="top: 20%; left: 30%; animation-delay: 0.3s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_main_copy.m</div></div>
+                <div class="forest-wrapper pop" style="top: 60%; left: 30%; animation-delay: 0.4s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_main_v2.m</div></div>
+                <div class="forest-wrapper pop" style="top: 10%; left: 55%; animation-delay: 0.6s; transform: rotate(-5deg);"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_main_copy_2.m</div></div>
+                <div class="forest-wrapper pop" style="top: 35%; left: 52%; animation-delay: 0.7s; transform: rotate(3deg);"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_v2_fixed.m</div></div>
+                <div class="forest-wrapper pop" style="top: 70%; left: 50%; animation-delay: 0.8s;"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_final.m</div></div>
+                <div class="forest-wrapper pop" style="top: 15%; left: 75%; animation-delay: 1.0s; transform: rotate(5deg);"><i class="fa-solid fa-tree tree-back text-yellow-200"></i><div class="forest-file bg-yellow-50 border-yellow-400"><i class="fa-solid fa-triangle-exclamation text-yellow-600"></i> sim_v2_fixed_real.m</div></div>
+                <div class="forest-wrapper pop" style="top: 50%; left: 70%; animation-delay: 1.2s; transform: scale(1.1);"><i class="fa-solid fa-tree tree-back text-red-200"></i><div class="forest-file bg-red-50 border-red-400 font-bold"><i class="fa-solid fa-skull text-red-600"></i> sim_final_FINAL.m</div></div>
+                <div class="forest-wrapper pop" style="top: 80%; left: 65%; animation-delay: 0.9s; transform: rotate(-10deg);"><i class="fa-solid fa-tree tree-back"></i><div class="forest-file"><i class="fa-solid fa-file-code text-red-500"></i> sim_final_presen.m</div></div>
+                
+                <div class="which-one-badge">どれ？？</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Mystery -->
+    <div class="slide-container" id="slide2">
+        <!-- Unified Header -->
+        <div class="slide-header">
+            <div class="header-top-row">
+                <span class="header-badge alert">あるある②</span>
+                <h1 class="header-title">STAP細胞はいずこへ？</h1>
+            </div>
+            <p class="header-subtitle">「あれ…どのシミュレーション条件で回したんだっけ？」</p>
+        </div>
+
+        <div class="content-area h-full flex flex-col justify-center">
+            <div class="flex items-center justify-center gap-10 h-full graph-paper rounded-xl p-4 border border-gray-200">
+                <!-- Result -->
+                <div class="mystery-card w-5/12 p-4 flex flex-col items-center relative border-4 border-yellow-400">
+                    <div class="absolute -top-4 -right-4 bg-yellow-400 text-yellow-900 font-black px-4 py-2 rounded-full shadow-lg transform rotate-12 z-20">奇跡の結果!!</div>
+                    <div class="w-full h-48 bg-slate-50 rounded flex items-end justify-center pb-4 overflow-hidden relative border border-gray-200">
+                        <svg viewBox="0 0 100 50" class="w-full h-full text-blue-500 stroke-current fill-none" stroke-width="2"><path d="M0,50 Q20,50 30,40 T50,10 T70,40 T100,45" /></svg>
+                        <div class="absolute top-2 right-2 text-xs text-gray-400">Result_20240520.png</div>
+                    </div>
+                    <p class="mt-4 text-center font-bold text-slate-700">「完璧なデータが出た！<br>これで論文が書ける！」</p>
+                </div>
+                
+                <div class="text-4xl text-gray-300"><i class="fa-solid fa-arrow-right"></i></div>
+                
+                <!-- Code -->
+                <div class="mystery-card w-5/12 p-6 bg-slate-800 text-gray-300 relative border-none">
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-1 rounded font-bold shadow">現在のコード</div>
+                    <div class="font-mono text-sm space-y-2">
+                        <p class="text-gray-500">% simulation.m</p>
+                        <p>clear all;</p>
+                        <div class="relative"><p>temp = <span class="text-yellow-300 font-bold line-through decoration-red-500 decoration-4">350</span>;</p><p>temp = <span class="text-green-400 font-bold">300</span>; <span class="text-gray-500">% ←書き換えた</span></p></div>
+                        <div class="relative"><p>alpha = <span class="text-green-400 font-bold">0.05</span>;</p></div>
+                        <p>run(temp, alpha);</p>
+                    </div>
+                    <div class="question-mark text-5xl" style="top: -20px; right: -20px;">?</div>
+                    <div class="mt-6 bg-red-900/50 border border-red-500/50 p-2 rounded text-red-200 text-center text-sm font-bold"><i class="fa-solid fa-triangle-exclamation"></i> パラメータは<br>上書きされて消滅</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Teaser End -->
+    <div class="slide-container" id="slide3">
+        <div class="teaser-container">
+            <div class="teaser-subtitle">この「絶望」から脱出する方法とは...？</div>
+            <h1 class="teaser-title">To Be Continued</h1>
+            <div class="mt-8">
+                <p class="text-slate-400 mb-2 text-sm font-bold tracking-widest uppercase">Main Session Theme</p>
+                <div class="teaser-main-theme">
+                    Git コード管理術
+                </div>
+            </div>
+            <div class="teaser-footer">Coming Soon to the Main Session</div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="controls">
+        <button class="btn" onclick="showSlide(1)">1</button>
+        <button class="btn" onclick="showSlide(2)">2</button>
+        <button class="btn" onclick="showSlide(3)">3 (予告)</button>
+    </div>
+
+    <script>
+        function showSlide(slideNum) {
+            document.querySelectorAll('.slide-container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('slide' + slideNum).classList.add('active');
+            const btn = document.querySelectorAll('.btn')[slideNum-1];
+            if(btn) btn.classList.add('active');
+            if(slideNum === 1) {
+                const els = document.querySelectorAll('#slide1 .pop');
+                els.forEach(el => { el.style.animation = 'none'; el.offsetHeight; el.style.animation = null; });
+            }
+        }
+        showSlide(1);
+    </script>
+</body>
+</html>
