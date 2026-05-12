@@ -1,0 +1,77 @@
+## 経過日ベースの図示
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# --- 前提: dfのindexがDatetimeIndexであること ---
+# df = pd.read_csv('stock_data.csv', index_col=0, parse_dates=True)
+
+# 1. 基準となる日付のリスト
+base_dates = ['2023-01-04', '2023-02-01', '2023-03-01']
+# 2. 観察したい期間（日）
+days_window = 14 
+
+plt.figure(figsize=(10, 6))
+
+for d in base_dates:
+    start_date = pd.to_datetime(d)
+    end_date = start_date + pd.Timedelta(days=days_window)
+    
+    # 期間内のデータをスライスで抽出
+    # ※土日が含まれていても、存在するデータ（平日）だけが抽出される
+    temp_df = df[start_date : end_date].copy()
+    
+    if temp_df.empty:
+        continue
+        
+    # --- ここがポイント ---
+    # x軸: DatetimeIndex から start_date を引いて「日」に変換
+    # (temp_df.index - start_date) は TimedeltaIndex を返し、.days で整数になる
+    x_days = (temp_df.index - start_date).days
+    
+    # y軸: 最初の日の価格を基準(0)とした変動額
+    # もし比率(%)にしたいなら: (temp_df['Close'] / temp_df['Close'].iloc[0] - 1) * 100
+    y_values = temp_df['Close'] - temp_df['Close'].iloc[0]
+    
+    # プロット
+    plt.plot(x_days, y_values, marker='o', label=f'Base: {start_date.date()}')
+
+# グラフの装飾
+plt.axhline(0, color='black', linewidth=0.8, linestyle='--') # 基準線
+plt.xlabel('Days since Base Date (Calendar Days)')
+plt.ylabel('Price Change from Base Date')
+plt.title('Stock Price Movement Comparison (Relative Days)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+## 株価自動取得
+pip install pandas_datareader
+
+import pandas_datareader.data as web
+import datetime
+import pandas as pd
+
+# 1. 取得期間の設定
+start = datetime.datetime(2014, 1, 1)
+end = datetime.datetime.now()
+
+# 2. 取得したいデータのコード（FREDのシンボル）を指定
+# DEXJPUS: ドル円
+# NIKKEI225: 日経平均
+# JPNCPIALLMINMEI: 日本の10年国債利回り（※FRED上のコード）
+symbols = {
+    'DEXJPUS': 'USD_JPY',
+    'NIKKEI225': 'Nikkei225',
+    'IRLTLT01JPM156N': 'JGB_10Y'  # 日本の長期金利(10年)
+}
+
+# 3. データの読み込み
+df = web.DataReader(list(symbols.keys()), 'fred', start, end)
+
+# 列名を分かりやすくリネーム
+df = df.rename(columns=symbols)
+
+# 欠損値（祝日など）を前の日の値で埋める
+df = df.ffill()
+
+print(df.tail())
